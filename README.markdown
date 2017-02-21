@@ -1,3 +1,4 @@
+```
 akka {
   loglevel = DEBUG
 }
@@ -18,3 +19,4 @@ throttling {
   	#time-to-idle = 60 //in seconds. Comment for Duration.Inf
   }
 }
+```
