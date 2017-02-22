@@ -30,7 +30,8 @@ class ThrottlingServiceTest extends TestKit(ActorSystem("MySpec")) with Implicit
   val GRASE_RPS = 5
   val slaService = SlaService()
   val throttlingService: ThrottlingService = ThrottlingService(GRASE_RPS, slaService, throttlingActor, CacheOptions())
-  implicit val timeout: Timeout = 5 milliseconds
+  implicit val timeout: Timeout = 20 milliseconds
+  val futureDuration: Duration = 300 milliseconds
 
   override def afterAll {
     TestKit.shutdownActorSystem(system)
@@ -39,14 +40,14 @@ class ThrottlingServiceTest extends TestKit(ActorSystem("MySpec")) with Implicit
   "An ThrottlingService.getSlaFunction" must {
     "work long at first time" in {
       val startTime = System.nanoTime()
-      val result = Await.result(throttlingService.getSlaByTokenCached(token1).mapTo[Sla], 300 milliseconds)
+      val result = Await.result(throttlingService.getSlaByTokenCached(token1).mapTo[Sla], futureDuration)
       val endTime = System.nanoTime()
 
       (endTime - startTime) should be >= longDuration.toNanos
     }
     "immidiatly (faster than 5 ms) works at second time" in {
       val startTime = System.nanoTime()
-      val result = Await.result(throttlingService.getSlaByTokenCached(token1).mapTo[Sla], 300 milliseconds)
+      val result = Await.result(throttlingService.getSlaByTokenCached(token1).mapTo[Sla], futureDuration)
       val endTime = System.nanoTime()
 
       (endTime - startTime) should be <= shortDuration.toNanos

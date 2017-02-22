@@ -19,8 +19,8 @@ import scala.concurrent.Future
 @RunWith(classOf[JUnitRunner])
 class ThrottlingActorTest extends TestKit(ActorSystem("MySpec")) with ImplicitSender
   with WordSpecLike with Matchers with BeforeAndAfterAll with BeforeAndAfterEach {
-  implicit val timeout: Timeout = 5 milliseconds
-  val futureDuration: Duration = 20 milliseconds
+  implicit val timeout: Timeout = 20 milliseconds
+  val futureDuration: Duration = 300 milliseconds
   
   val users = List[User](User("user1", 10), User("user2", 20), User("user3", 30), User("user4", 40), User("user5", 50))
   import system.dispatcher

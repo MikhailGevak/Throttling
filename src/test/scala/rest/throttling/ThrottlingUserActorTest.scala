@@ -21,7 +21,7 @@ class ThrottlingUserActorTest() extends TestKit(ActorSystem("MySpec")) with Impl
 
   import system.dispatcher
   import ThrottlingUserActor._
-  implicit val timeout: Timeout = 5 milliseconds
+  implicit val timeout: Timeout = 20 milliseconds
   val RPS = 5
   val user = AuthUser("TestUser", RPS)
 
@@ -35,13 +35,13 @@ class ThrottlingUserActorTest() extends TestKit(ActorSystem("MySpec")) with Impl
 
       userCounter ! ThrottlingUserActor.IsAllowedRequest(user)
       expectMsg(ThrottlingUserActor.AllowedAnswer(user.name, true))
-      
+
       system.stop(userCounter)
     }
 
     "send back 5 positive AllowedAnswer and 1 negative AllowedAnswer for 6 requests" in {
       val userCounter = system.actorOf(ThrottlingUserActor.props(user.rps))
-        
+
       val responsesFutures = for (i <- 1 to RPS + 1) yield { ask(userCounter, IsAllowedRequest(user)).mapTo[AllowedAnswer] }
 
       val responses = Await.result(Future.sequence(responsesFutures), timeout.duration)
@@ -51,13 +51,13 @@ class ThrottlingUserActorTest() extends TestKit(ActorSystem("MySpec")) with Impl
 
       positives should equal(RPS)
       negatives should equal(1)
-      
+
       system.stop(userCounter)
     }
-    
+
     "send back 10 positive AllowedAnswer for 5 requests and 5 requests every 215 ms" in {
       val userCounter = system.actorOf(ThrottlingUserActor.props(user.rps))
-        
+
       val responsesFutures1 = for (i <- 1 to RPS) yield { ask(userCounter, IsAllowedRequest(user)).mapTo[AllowedAnswer] }
 
       val responsesFutures2 = for (i <- 1 to RPS) yield {
@@ -72,7 +72,7 @@ class ThrottlingUserActorTest() extends TestKit(ActorSystem("MySpec")) with Impl
 
       positives should equal(2 * RPS)
       negatives should equal(0)
-      
+
       system.stop(userCounter)
     }
   }
