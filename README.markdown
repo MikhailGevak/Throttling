@@ -34,7 +34,7 @@ throttling {
 ```
 #Load Test Result
 You can find test results for *5* users, *10* rps and during *10* seconds.
-Throttling is on: https://github.com/MikhailGevak/Throttling/blob/master/tests/throttling_5_10_10%20seconds.log
-Throttling is off: https://github.com/MikhailGevak/Throttling/blob/master/tests/throttling_5_10_10%20seconds.log
+*Throttling is on: https://github.com/MikhailGevak/Throttling/blob/master/tests/throttling_5_10_10%20seconds.log
+*Throttling is off: https://github.com/MikhailGevak/Throttling/blob/master/tests/throttling_5_10_10%20seconds.log
 
 So, you can see that response times for top requests are strange. I think it's a spray-http-client problem :( Program notes startTime, sends request to IO(Http) and notes finish time when response is received. And the problem has to be investigated.
