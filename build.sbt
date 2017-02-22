@@ -26,3 +26,7 @@ libraryDependencies ++= {
 }
 
 Revolver.settings
+
+mainClass in (Compile, packageBin) := Some("rest.Boot")
+
+mainClass in (Compile, run) := Some("rest.Boot")

@@ -28,7 +28,7 @@ trait SlaService {
   import SlaService._
   var nextElement = -1 //we have to start from 0
   val users = IndexedSeq[Sla](Sla("john", 50), Sla("ivan", 30), Sla("kraine", 70), Sla("kane", 40))
-  val tokens = new mutable.HashMap[String, Sla]()
+  val tokens = mutable.HashMap[String, Sla]("1234" -> Sla("billy", 60))
   val rand = new Random(System.currentTimeMillis())
 
   def getSlaByToken(token: String): Future[Sla] = Future[Sla] {

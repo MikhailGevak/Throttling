@@ -8,12 +8,12 @@ import akka.util.Timeout
 import scala.concurrent.duration._
 import rest.hello.HelloWorldService
 import rest.hello.HelloWorldServiceActor
-import rest.hello.ThrottlingHelloWorldServiceActor
 import rest.throttling.ThrottlingActor
 import com.typesafe.config.ConfigFactory
 import rest.throttling.ThrottlingService.CacheOptions
 import com.typesafe.config.Config
 import java.util.concurrent.TimeUnit
+import rest.sla.SlaService
 
 object Boot extends App {
   val conf = ConfigFactory.load
@@ -26,14 +26,12 @@ object Boot extends App {
 
   // create and start our service actors
   val throttlingActor = system.actorOf(ThrottlingActor.props, ThrottlingActor.name)
-  val helloWorldService = system.actorOf(HelloWorldServiceActor.props, "hello-world-service")
-  val throttlingHelloWorldService = system.actorOf(ThrottlingHelloWorldServiceActor.props(throttlingActor, graceRps, cacheOptions), "throttling-hello-world-service")
+  val helloWorldService = system.actorOf(HelloWorldServiceActor.props(throttlingActor, graceRps, cacheOptions, SlaService()), "hello-world-service")
 
   implicit val timeout = Timeout(5.seconds)
   // start a new HTTP server on port 8080 with our service actor as the handler
   IO(Http) ! Http.Bind(helloWorldService, interface = "localhost", port = sprayConf.getInt("port"))
-  IO(Http) ! Http.Bind(throttlingHelloWorldService, interface = "localhost", port = sprayConf.getInt("throttling-port"))
-
+  
   private[this] def getCacheOptionsFromConf(conf: Config) = {
     val defaultConfig = CacheOptions()
     val maxCapacity = if (conf.hasPath("max-capacity")) { conf.getInt("max-capacity") } else { defaultConfig.maxCapacity }

@@ -54,7 +54,7 @@ trait ThrottlingService {
    */
 
   def isRequestAllowed(token: Option[String]): Boolean = {
-    implicit val timeout = Timeout(5 milliseconds)
+    implicit val timeout = Timeout(50 milliseconds)
     val result: AllowedAnswer = Await.result(getThrottlingAsk(token).mapTo[AllowedAnswer], timeout.duration)
     result.allowed
   }
@@ -72,11 +72,7 @@ trait ThrottlingService {
   private[this] def getThrottlingAsk(token: Option[String]): Future[Any] = {
     val user = token map { getUserByToken } getOrElse guest
 
-    throttlingActor ? IsAllowedRequest(user) recover {
-      case th: Throwable =>
-        th.printStackTrace
-        AllowedAnswer(user.name, false)
-    }
+    throttlingActor ? IsAllowedRequest(user)
   }
 
   protected[throttling] def clearCache = {
